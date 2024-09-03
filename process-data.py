@@ -1,8 +1,7 @@
 import itertools
 from collections import defaultdict
 from typing import List
-import string
-
+import re
 
 
 class ProcessData:
@@ -14,8 +13,7 @@ class ProcessData:
         return sub_strings
 
     def remove_punctuation(self, line):
-        translator = str.maketrans('', '', string.punctuation)
-        return " ".join(line.lower().translate(translator).split())
+        return " ".join(re.sub(r'[^\w\s]', '', line.lower()).split())
 
     def process(self, lines: List, filename: str):
         for i, line in enumerate(lines, 1):
