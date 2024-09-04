@@ -160,11 +160,10 @@ class AutoComplete:
         return found_key
 
     def get_words_completions(self, sentence):
-
         words = sentence.split()
-
         lines = set()
 
+        # Find lines that contain all the words in the input sentence and intersect them
         for word in words:
             if word in self.ht:
                 if len(lines) == 0:
@@ -177,7 +176,14 @@ class AutoComplete:
                     lines.intersection_update(self.ht[new_word])
                 else:
                     return []
-        return list(lines)[:5]
+
+        # Filter lines to ensure they contain the full input sentence
+        filtered_lines = []
+        for line in lines:
+            if sentence.lower() in line[0].lower():
+                filtered_lines.append(line)
+
+        return filtered_lines[:5]
 
 
 
