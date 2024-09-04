@@ -159,6 +159,32 @@ class AutoComplete:
 
         return found_key
 
+    def get_words_completions(self, sentence):
+
+        words = sentence.split()
+
+        lines = set()
+
+        for word in words:
+            if word in self.ht:
+                if len(lines) == 0:
+                    lines = set(self.ht[word])
+                else:
+                    lines.intersection_update(self.ht[word])
+            else:
+                new_word = self.get_best_completions(word)
+                if new_word:
+                    lines.intersection_update(self.ht[new_word])
+                else:
+                    return []
+        return list(lines)[:5]
+
+
+
+
+
+
+
 
 
     """ good """
