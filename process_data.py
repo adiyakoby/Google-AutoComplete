@@ -9,15 +9,17 @@ class ProcessData:
         self.__data = defaultdict(list)
 
     def get_all_substrings(self, s: str, sub_strings: List[str]):
-        sub_strings = [s[i:j] for i, j in itertools.combinations(range(len(s) + 1), 2)]
-
+        n = len(sub_strings)
+        for i in range(n):
+            for j in range(i + 1, n+1):
+                sub_strings.append(s[i:j])
 
     def remove_punctuation(self, line):
         return " ".join(re.sub(r'[^\w\s]', '', line.lower()).split())
 
     def process(self, lines: List, filename: str):
-        sub_strings = []
         for i in range(len(lines)):
+            sub_strings = []
             clean_line = self.remove_punctuation(lines[i].strip())
 
             if clean_line:
