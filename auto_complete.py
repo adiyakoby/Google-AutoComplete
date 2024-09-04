@@ -137,7 +137,7 @@ class AutoComplete:
         list_of_suitable_by_add_char = self.character_addition(subtext)
 
         combining_list = list_of_suitable_by_replace_char + list_of_suitable_by_add_char \
-                         + list_of_suitable_by_replace_char
+                         + list_of_suitable_by_delete_char
 
         combining_list.sort(reverse=True, key=lambda item: item[1])
         if len(combining_list) > 5:
@@ -175,7 +175,7 @@ class AutoComplete:
 
         if subtext in self.ht:
             # If the subtext itself is a valid word, return the five suitable lines
-            return [(subtext, self.ht[subtext][:5])]
+            return self.create_five_auto_complete_data_objects(self.ht[subtext][:5])
         else:
             most_five_suitable_lines = self.find_most_five_suitable_lines(subtext)
             autoCompleteData_list = self.create_five_auto_complete_data_objects(most_five_suitable_lines)
