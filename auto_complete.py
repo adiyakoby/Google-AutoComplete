@@ -148,13 +148,16 @@ class AutoComplete:
 
 
     def get_best_completions(self, subtext):
-        combining_list = self.replace_char(subtext) + self.delete_char(subtext) + self.add_char(subtext)
 
-        combining_list.sort(reverse=True, key=lambda item: item[1])
-        if len(combining_list) > 5:
-            return combining_list[:5]
-        else:
-            return combining_list
+        combining_list = self.replace_char(subtext) + self.delete_char(subtext) + self.add_char(subtext)
+        higher = 0
+        found_key = ""
+        for combination in combining_list:
+            if combination[1] > higher:
+                higher = combination[1]
+                found_key = combination[0]
+
+        return found_key
 
 
 
@@ -174,6 +177,6 @@ class AutoComplete:
         if user_input in self.ht:
             return self.create_auto_complete(self.ht[user_input][:k])
         else:
-            return self.create_auto_complete(self.get_best_completions(user_input))
+            return self.create_auto_complete(self.ht[self.get_best_completions(user_input)][:k])
 
 

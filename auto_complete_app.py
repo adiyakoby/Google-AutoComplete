@@ -24,7 +24,7 @@ class AutoCompleteApp:
             else:
                 current_query += query
 
-            results = auto_complete.get_best_k_completion(current_query)
+            results = auto_complete.get_best_k_completion(current_query.strip().lower())
 
             # Ensure you are printing only available results
             for i in range(min(5, len(results))):
