@@ -1,3 +1,4 @@
+import itertools
 from collections import defaultdict
 from typing import List
 import re
@@ -35,8 +36,9 @@ class ProcessData:
         Initializes the ProcessData class with an empty defaultdict to store the processed data.
         """
         self.__data = defaultdict(list)
+        self.__word_re = re.compile(r'\b[a-z]+\b')
 
-    def get_all_substrings(self, s: str, sub_strings: List[str]):
+    def get_all_substrings(self, line: str):
         """
         Generates all possible substrings from a given string `s` and appends
         them to the `sub_strings` list.
@@ -48,10 +50,21 @@ class ProcessData:
         sub_strings : List[str]
             A list to store the generated substrings.
         """
-        n = len(sub_strings)
-        for i in range(n):
-            for j in range(i + 1, n+1):
-                sub_strings.append(s[i:j])
+        sub_strings = []
+        words = line.split()
+        for i in range(len(words)):
+            for j in range(2, len(words[i])+1):
+                sub_strings.append(words[i][0:j])
+            if i > 1:
+                sub_strings.append(words[i-1] + words[i][:1])
+                sub_strings.append(words[i - 1][1:] + words[i][:1])
+            sub_strings.append(words[i][1:])
+        return sub_strings
+
+
+
+
+
 
     def remove_punctuation(self, line):
         """
@@ -68,7 +81,8 @@ class ProcessData:
         str
             The cleaned string without punctuation, converted to lowercase.
         """
-        return " ".join(re.sub(r'[^\w\s]', '', line.lower()).split())
+        return ' '.join(self.__word_re.findall(line.lower()))
+
 
     def process(self, lines: List, filename: str):
         """
@@ -82,14 +96,15 @@ class ProcessData:
         filename : str
             The name of the file where the lines originated from.
         """
+
         for i in range(len(lines)):
-            sub_strings = []
             clean_line = self.remove_punctuation(lines[i].strip())
 
             if clean_line:
-                self.get_all_substrings(clean_line, sub_strings)
-                for substring in sub_strings:
+                sub_string = self.get_all_substrings(clean_line)
+                for substring in sub_string:
                     self.__data[substring].append((lines[i], i+1,  filename))
+
 
     def get_data(self):
         """
