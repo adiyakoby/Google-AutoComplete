@@ -18,7 +18,7 @@ def user_interaction(ht: Dict[str, List[str]]):
         else:
             current_query += query
 
-        results = auto_complete.search(current_query)
+        results = auto_complete.get_best_k_completion(current_query)
         print(f"\nSuggestions: {results}\n")
         print(f"Continue typing or enter '#' to start a new search.")
 
