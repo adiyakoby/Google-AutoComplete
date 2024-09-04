@@ -38,7 +38,7 @@ class ProcessData:
         self.__data = defaultdict(list)
         self.__word_re = re.compile(r'\b[a-z]+\b')
 
-    def get_all_substrings(self, line: str):
+    def get_all_substrings(self, words: List[str]):
         """
         Generates all possible substrings from a given string `s` and appends
         them to the `sub_strings` list.
@@ -50,15 +50,12 @@ class ProcessData:
         sub_strings : List[str]
             A list to store the generated substrings.
         """
-        sub_strings = []
-        words = line.split()
+        sub_strings = set()
         for i in range(len(words)):
-            for j in range(2, len(words[i])+1):
-                sub_strings.append(words[i][0:j])
-            if i > 1:
-                sub_strings.append(words[i-1] + words[i][:1])
-                sub_strings.append(words[i - 1][1:] + words[i][:1])
-            sub_strings.append(words[i][1:])
+            n = len(words[i])
+            for j in range(2, n+1):
+                sub_strings.add(words[i][0:j])
+                sub_strings.add(words[i][-j:n])
         return sub_strings
 
 
@@ -101,9 +98,10 @@ class ProcessData:
             clean_line = self.remove_punctuation(lines[i].strip())
 
             if clean_line:
-                sub_string = self.get_all_substrings(clean_line)
+                sub_string = self.get_all_substrings(clean_line.split())
                 for substring in sub_string:
-                    self.__data[substring].append((lines[i], i+1,  filename))
+                    self.__data[substring].append((lines[i], i+1, filename))
+        print("proccessed file", filename)
 
 
     def get_data(self):
