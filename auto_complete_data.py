@@ -1,4 +1,3 @@
-
 class AutoCompleteData:
     # completed_sentence: str
     # source_text: str
@@ -22,10 +21,10 @@ class AutoCompleteData:
         return self.completed_sentence
 
     def get_source_text(self):
-        return self.source_tex
+        return self.source_text
 
     def get_offset(self):
-        return self.offse
+        return self.offset
 
     def get_score(self):
         return self.score
