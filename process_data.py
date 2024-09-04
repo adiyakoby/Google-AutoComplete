@@ -1,4 +1,3 @@
-import itertools
 from collections import defaultdict
 from typing import List
 import re
@@ -100,7 +99,7 @@ class ProcessData:
             if clean_line:
                 sub_string = self.get_all_substrings(clean_line.split())
                 for substring in sub_string:
-                    self.__data[substring].append((lines[i], i+1, filename))
+                    self.__data[substring].append((lines[i], i+1, filename or "Unknown"))
         print("proccessed file", filename)
 
 
@@ -115,6 +114,9 @@ class ProcessData:
             containing the original content, its index in the input, and the filename.
         """
         return self.__data
+
+    def set_data(self, data):
+        self.__data = data
 
 
 if __name__ == "__main__":

@@ -6,10 +6,10 @@ class AutoComplete:
     def __init__(self, ht):
         self.ht = ht
 
-    def get_auto_complete(self, lines):
-
+    """ good """
+    def create_auto_complete(self, lines):
         responses = []
-        for i in range(len(lines)): # lines[i], i+1, filename)
+        for i in range(len(lines)):
             responses.append(
                 AutoCompleteData(
                     lines[i][0],  # completed_sentence
@@ -18,7 +18,7 @@ class AutoComplete:
                 ))
         return responses
 
-
+    """ good """
     def delete_char(self, sentence: str):
         score = (len(sentence) - 1) * 2
         valid_sentences = []
@@ -35,10 +35,12 @@ class AutoComplete:
         # return the top 5 valid sentences
         return valid_sentences
 
+    """ good """
     def addition_score(self, index, max_score):
         return max_score - ([10, 8, 6, 4][index] if index < 4 else 2)
 
-    def character_addition(self, sentence):  # THEE GOOD
+    """ good """
+    def add_char(self, sentence):  # THEE GOOD
         n = len(sentence) - 1
         res = []
         for char in range(ord('a'), ord('z') + 1):
@@ -50,7 +52,7 @@ class AutoComplete:
                     break
         return res
 
-    #####################################################################################
+
     def has_multiple_mismatches(self, subtext):
         """
         Checks if the subtext contains more than one word that is not in the subtext dictionary.
@@ -123,7 +125,7 @@ class AutoComplete:
 
         return possible_words
 
-    def find_most_suitable_lines_by_replace_char(self, subtext):
+    def replace_char(self, subtext):
         """
         Checks if a single character in the given subtext can be replaced to form a valid word.
 
@@ -143,40 +145,64 @@ class AutoComplete:
         end_word_index = start_index + len(mismatched_word) - 1
         return self.generate_possible_replacements(mismatched_word, subtext, end_word_index)
 
-    #####################################################################################################
-    def find_most_five_suitable_lines(self, subtext):
-        list_of_suitable_by_replace_char = self.find_most_suitable_lines_by_replace_char(subtext)
-        list_of_suitable_by_delete_char = self.delete_char(subtext)
-        list_of_suitable_by_add_char = self.character_addition(subtext)
-
-        combining_list = list_of_suitable_by_replace_char + list_of_suitable_by_add_char \
-                         + list_of_suitable_by_delete_char
-
-        combining_list.sort(reverse=True, key=lambda item: item[1])
-        if len(combining_list) > 5:
-            return combining_list[:5]
-        else:
-            return combining_list
 
 
+    def get_best_completions(self, subtext):
+
+        combining_list = self.replace_char(subtext) + self.delete_char(subtext) + self.add_char(subtext)
+        higher = 0
+        found_key = ""
+        for combination in combining_list:
+            if combination[1] > higher:
+                higher = combination[1]
+                found_key = combination[0]
+
+        return found_key
+
+    def get_words_completions(self, sentence):
+
+        words = sentence.split()
+
+        lines = set()
+
+        for word in words:
+            if word in self.ht:
+                if len(lines) == 0:
+                    lines = set(self.ht[word])
+                else:
+                    lines.intersection_update(self.ht[word])
+            else:
+                new_word = self.get_best_completions(word)
+                if new_word:
+                    lines.intersection_update(self.ht[new_word])
+                else:
+                    return []
+        return list(lines)[:5]
 
 
-    def get_best_k_completion(self, user_input: str):
+
+
+
+
+
+
+
+    """ good """
+    def get_best_k_completion(self, user_input: str, k = 5):
         """
         Gets the best k completion candidates for the given subtext.
 
         Args:
-            subtext: The subtext to complete.
-            subtextdict: A dictionary containing subtext strings and the mach line.
+            :param user_input:  The subtext to complete.
+            :param k:  amount of lines to retrieve.
 
         Returns:
             A list of tuples, where each tuple contains a completion candidate and its score.
-        """
 
+        """
         if user_input in self.ht:
-            return self.get_auto_complete(self.ht[user_input][:5])
+            return self.create_auto_complete(self.ht[user_input][:k])
         else:
-            most_five_suitable_lines = self.find_most_five_suitable_lines(user_input)
-            return self.get_auto_complete(most_five_suitable_lines)
+            return self.create_auto_complete(self.ht[self.get_best_completions(user_input)][:k])
 
 

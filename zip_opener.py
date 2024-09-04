@@ -1,6 +1,5 @@
 import zipfile
 from process_data import ProcessData
-from typing import Dict, List
 
 
 class ZipOpener:
