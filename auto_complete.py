@@ -6,6 +6,19 @@ class AutoComplete:
     def __init__(self, ht):
         self.ht = ht
 
+    def get_auto_complete(self, lines):
+
+        responses = []
+        for i in range(len(lines)): # lines[i], i+1, filename)
+            responses.append(
+                AutoCompleteData(
+                    lines[i][0],  # completed_sentence
+                    lines[i][2],  # source_text
+                    lines[i][1]   # offset
+                ))
+        return responses
+
+
     def delete_char(self, sentence: str):
         score = (len(sentence) - 1) * 2
         valid_sentences = []
@@ -145,23 +158,10 @@ class AutoComplete:
         else:
             return combining_list
 
-    def create_five_auto_complete_data_objects(self, most_five_suitable_lines):
-        if len(most_five_suitable_lines) == 0:
-            return []
 
-        auto_complete_object = []
-        for i in range(5):
-            line_in_file = self.ht[most_five_suitable_lines[i][0]][0]
-            name_of_source_file = self.ht[most_five_suitable_lines[i][0]][2]
-            offset = self.ht[most_five_suitable_lines[i][0]][1]
-            score = most_five_suitable_lines[i][1]
-            auto_complete_object.append(
-                AutoCompleteData(line_in_file, name_of_source_file, offset, score))
-        return auto_complete_object
 
-    ##############################################################################################
 
-    def get_best_k_completion(self, subtext: str):
+    def get_best_k_completion(self, user_input: str):
         """
         Gets the best k completion candidates for the given subtext.
 
@@ -173,11 +173,10 @@ class AutoComplete:
             A list of tuples, where each tuple contains a completion candidate and its score.
         """
 
-        if subtext in self.ht:
-            # If the subtext itself is a valid word, return the five suitable lines
-            return self.create_five_auto_complete_data_objects(self.ht[subtext][:5])
+        if user_input in self.ht:
+            return self.get_auto_complete(self.ht[user_input][:5])
         else:
-            most_five_suitable_lines = self.find_most_five_suitable_lines(subtext)
-            autoCompleteData_list = self.create_five_auto_complete_data_objects(most_five_suitable_lines)
+            most_five_suitable_lines = self.find_most_five_suitable_lines(user_input)
+            return self.get_auto_complete(most_five_suitable_lines)
 
-            return autoCompleteData_list
+
