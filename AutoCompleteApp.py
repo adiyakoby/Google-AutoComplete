@@ -15,18 +15,18 @@ class AutoCompleteApp:
         print("Data processed successfully.")
 
         auto_complete = AutoComplete(data_processor.get_data())
-        current_query = ""
+        current_query = []
 
         while True:
-            query = input(f"{current_query}")
+            query = input(f"{' '.join(current_query)} ")
             if query == 'exit':
                 break
             elif query == '#':
-                current_query = ""
+                current_query = []
                 continue
             else:
-                current_query += query
+                current_query.extend(query.strip().split())
 
-            results = auto_complete.get_best_k_completion(current_query)
+            results = auto_complete.get_best_k_completion(' '.join(current_query))
             for i in range(5):
                 print(i+1, results[i])
