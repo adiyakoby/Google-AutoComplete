@@ -284,3 +284,4 @@ class AutoComplete:
             return self.create_auto_complete(random_elements)
         else:
             return self.create_auto_complete(final_lines)
+          
