@@ -161,9 +161,9 @@ class AutoComplete:
 
     def get_words_completions(self, sentence):
         words = sentence.split()
-
         lines = set()
 
+        # Find lines that contain all the words in the input sentence and intersect them
         for word in words:
             if word in self.ht:
                 if len(lines) == 0:
