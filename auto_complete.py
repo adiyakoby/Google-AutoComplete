@@ -1,6 +1,6 @@
 import string
 from auto_complete_data import AutoCompleteData
-
+import random
 
 class AutoComplete:
     def __init__(self, ht):
@@ -177,13 +177,13 @@ class AutoComplete:
                 else:
                     return []
 
-        # Filter lines to ensure they contain the full input sentence
-        filtered_lines = []
-        for line in lines:
-            if sentence.lower() in line[0].lower():
-                filtered_lines.append(line)
+        lines_list = list(lines)
 
-        return filtered_lines[:5]
+        if len(lines_list) > 5:
+            random_elements = random.sample(lines_list, 5)
+            return random_elements
+        else:
+            return lines_list
 
 
 
