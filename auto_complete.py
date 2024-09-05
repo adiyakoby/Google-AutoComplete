@@ -51,7 +51,6 @@ class AutoComplete:
                 cur_word = sentence[:i] + chr(char) + sentence[i:]
                 if cur_word in self.ht:
                     res.append((cur_word, self.addition_score(i, n * 2)))
-        print("add_char returns", res)
         return res
 
 
@@ -205,10 +204,13 @@ class AutoComplete:
                     return []
 
         final_lines = []
-        for line in lines:
-            line_words = self.__word_re.findall(line[0].lower().strip())
-            if self.check_if_input_in_line(correct_sentence, line_words):
-                final_lines.append(line)
+        if len(user_words) > 1:
+            for line in lines:
+                line_words = self.__word_re.findall(line[0].lower().strip())
+                if self.check_if_input_in_line(correct_sentence, line_words):
+                    final_lines.append(line)
+        else:
+            final_lines = list(lines)
 
 
         if len(final_lines) > k:
