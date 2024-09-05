@@ -1,6 +1,6 @@
 import string
 from auto_complete_data import AutoCompleteData
-
+import random
 
 class AutoComplete:
     def __init__(self, ht):
@@ -160,7 +160,6 @@ class AutoComplete:
         return found_key
 
     def get_words_completions(self, sentence):
-
         words = sentence.split()
 
         lines = set()
@@ -177,7 +176,14 @@ class AutoComplete:
                     lines.intersection_update(self.ht[new_word])
                 else:
                     return []
-        return list(lines)[:5]
+
+        lines_list = list(lines)
+
+        if len(lines_list) > 5:
+            random_elements = random.sample(lines_list, 5)
+            return random_elements
+        else:
+            return lines_list
 
 
 
