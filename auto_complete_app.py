@@ -37,11 +37,11 @@ class AutoCompleteApp:
             else:
                 current_query += query
 
-            results = auto_complete.get_words_completions(current_query.strip().lower())
+            results = auto_complete.get_best_k_completion(current_query.strip().lower())
 
             # Ensure printing only 5 available results
-            for i in range(min(5, len(results))):
-                print(f"{i + 1}) {results[i][0]} (Line: {results[i][1]}, Filename: {results[i][2]})")
+            for i in range(len(results)):
+                print(f'({i+1}) {results[i]}')
 
         print("Goodbye!")
 

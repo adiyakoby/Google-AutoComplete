@@ -1,10 +1,13 @@
 import string
 from auto_complete_data import AutoCompleteData
 import random
+import re
+
 
 class AutoComplete:
     def __init__(self, ht):
         self.ht = ht
+        self.__word_re = re.compile(r'\b[a-z]+\b')
 
     """ good """
     def create_auto_complete(self, lines):
@@ -41,15 +44,14 @@ class AutoComplete:
 
     """ good """
     def add_char(self, sentence):  # THEE GOOD
-        n = len(sentence) - 1
+        n = len(sentence)
         res = []
         for char in range(ord('a'), ord('z') + 1):
             for i in range(n, -1, -1):
                 cur_word = sentence[:i] + chr(char) + sentence[i:]
                 if cur_word in self.ht:
                     res.append((cur_word, self.addition_score(i, n * 2)))
-                if len(res) == 5:
-                    break
+        print("add_char returns", res)
         return res
 
 
@@ -150,7 +152,7 @@ class AutoComplete:
     def get_best_completions(self, subtext):
 
         combining_list = self.replace_char(subtext) + self.delete_char(subtext) + self.add_char(subtext)
-        higher = 0
+        higher = float('-inf')
         found_key = ""
         for combination in combining_list:
             if combination[1] > higher:
@@ -159,56 +161,81 @@ class AutoComplete:
 
         return found_key
 
-    def get_words_completions(self, sentence):
-        words = sentence.split()
+
+
+    def check_if_input_in_line(self, user_input_words, line_words):
+
+        for i, word in enumerate(line_words):
+            if user_input_words[0] in word:
+                j, k = 0, i
+                while j < len(user_input_words) and k < len(line_words):
+                    if user_input_words[j] not in line_words[k]:
+                        return False
+                    j += 1
+                    k += 1
+
+                if j == len(user_input_words):
+                    return True
+        return False
+
+
+
+    def get_best_k_completion(self, user_input, k = 5):
+        user_words = self.__word_re.findall(user_input.lower().strip())
         lines = set()
+        correct_sentence = []
 
         # Find lines that contain all the words in the input sentence and intersect them
-        for word in words:
+        for word in user_words:
             if word in self.ht:
                 if len(lines) == 0:
                     lines = set(self.ht[word])
                 else:
                     lines.intersection_update(self.ht[word])
+                correct_sentence.append(word)
             else:
                 new_word = self.get_best_completions(word)
                 if new_word:
-                    lines.intersection_update(self.ht[new_word])
+                    if len(lines) == 0:
+                        lines = set(self.ht[new_word])
+                    else:
+                        lines.intersection_update(self.ht[new_word])
+                    correct_sentence.append(new_word)
                 else:
                     return []
 
-        lines_list = list(lines)
+        final_lines = []
+        for line in lines:
+            line_words = self.__word_re.findall(line[0].lower().strip())
+            if self.check_if_input_in_line(correct_sentence, line_words):
+                final_lines.append(line)
 
-        if len(lines_list) > 5:
-            random_elements = random.sample(lines_list, 5)
-            return random_elements
+
+        if len(final_lines) > k:
+            random_elements = random.sample(final_lines, k)
+            return self.create_auto_complete(random_elements)
         else:
-            return lines_list
+            return self.create_auto_complete(final_lines)
 
 
 
-
-
-
-
-
-
-    """ good """
-    def get_best_k_completion(self, user_input: str, k = 5):
-        """
-        Gets the best k completion candidates for the given subtext.
-
-        Args:
-            :param user_input:  The subtext to complete.
-            :param k:  amount of lines to retrieve.
-
-        Returns:
-            A list of tuples, where each tuple contains a completion candidate and its score.
-
-        """
-        if user_input in self.ht:
-            return self.create_auto_complete(self.ht[user_input][:k])
-        else:
-            return self.create_auto_complete(self.ht[self.get_best_completions(user_input)][:k])
-
-
+    #
+    # """ good """
+    # def get_best_k_completion(self, user_input: str, k = 5):
+    #     """
+    #     Gets the best k completion candidates for the given subtext.
+    #
+    #     Args:
+    #         :param user_input:  The subtext to complete.
+    #         :param k:  amount of lines to retrieve.
+    #
+    #     Returns:
+    #         A list of tuples, where each tuple contains a completion candidate and its score.
+    #
+    #     """
+    #     if user_input in self.ht:
+    #         return self.create_auto_complete(self.ht[user_input][:k])
+    #     else:
+    #         return self.create_auto_complete(self.ht[self.get_best_completions(user_input)][:k])
+    #
+    #
