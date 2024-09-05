@@ -1,43 +1,34 @@
 class AutoCompleteData:
-    # completed_sentence: str
-    # source_text: str
-    # offset: int
-    # score: int
+    """
+    Represents an autocomplete suggestion with associated metadata.
 
-    def __init__(self, completed_sentence, source_text, offset, score):
-        self.completed_sentence = completed_sentence
-        self.source_text = source_text
-        self.offset = offset
-        self.score = score
+    Attributes:
+        completed_sentence (str): The suggested completed sentence.
+        source_text (str): The filename from which the suggestion originates.
+        offset (int): The line number in the source file where the sentence is located.
+        score (int): The relevance score of the suggestion (default is 0).
+    """
+
+    def __init__(self, completed_sentence: str, source_text: str, offset: int, score: int = 0):
+        """
+        Initializes the AutoCompleteData instance with sentence details.
+
+        Parameters:
+            completed_sentence (str): The suggested completed sentence.
+            source_text (str): The filename where the sentence was found.
+            offset (int): The line number in the file.
+            score (int, optional): The relevance score of the suggestion. Defaults to 0.
+        """
+        self.__completed_sentence = completed_sentence
+        self.__source_text = source_text
+        self.__offset = offset
+        self.__score = score
 
     def __str__(self):
-        return f"Completed Sentence: {self.completed_sentence}\n" \
-               f"Source Text: {self.source_text}\nOffset: {self.offset}\nScore: {self.score}"
+        """
+        Returns a string representation of the autocomplete suggestion.
 
-    def __repr__(self):
-        return f"AutoCompleteData(completed_sentence='{self.completed_sentence}', source_text='{self.source_text}', offset={self.offset}, score={self.score})"
-
-    def get_completed_sentence(self):
-        return self.completed_sentence
-
-    def get_source_text(self):
-        return self.source_text
-
-    def get_offset(self):
-        return self.offset
-
-    def get_score(self):
-        return self.score
-
-    def set_completed_sentence(self, completed_sentence):
-        self.completed_sentence = completed_sentence
-
-    def set_source_text(self, source_text):
-        self.source_text = source_text
-
-    def set_offset(self, offset):
-        self.offset = offset
-
-    def set_score(self, score):
-        self.score = score
-
+        Returns:
+            str: A formatted string containing the sentence, source filename, and line number.
+        """
+        return f" {self.__completed_sentence} (Filename: {self.__source_text} Line: {self.__offset})"

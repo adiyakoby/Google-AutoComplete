@@ -1,36 +1,39 @@
 import zipfile
 from process_data import ProcessData
-from typing import Dict, List
 
 
 class ZipOpener:
     """
-    A class to handle operations on a zip file containing text files.
+    A class to handle operations on a ZIP file containing text files.
+
+    This class provides functionality to read and process text files within a ZIP archive.
     """
 
     def __init__(self, zip_file: str):
+        """
+        Initializes the ZipOpener with the specified ZIP file.
+
+        Parameters:
+            zip_file (str): The path to the ZIP file to be opened.
+        """
         self.zip_file = zip_file
         self.zip = zipfile.ZipFile(zip_file, 'r')
 
-    def __enter__(self):
-        return self
-
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Ensures that the ZIP file is properly closed when exiting the context.
+        """
         self.zip.close()
 
-    def read(self, processData: ProcessData) -> None:
+    def read(self, process_data: ProcessData) -> None:
         """
-        Reads and processes all '.txt' files from the zip archive.
+        Reads and processes all '.txt' files from the ZIP archive.
 
-        This method iterates over all the files in the zip archive. For each
-        '.txt' file, it reads the content, splits it into rows, and processes
-        the rows using the provided ProcessData instance.
+        For each text file in the ZIP, this method reads its content, splits it into
+        lines, and processes each line using the provided ProcessData instance.
 
         Parameters:
-        -----------
-        processData : ProcessData
-            An instance of the ProcessData class where the processed data
-            will be stored.
+            process_data (ProcessData): The data processor to handle the file content.
         """
         with zipfile.ZipFile(self.zip_file, 'r') as zip_ref:
             for file_info in zip_ref.infolist():
@@ -38,4 +41,4 @@ class ZipOpener:
                     with zip_ref.open(file_info) as file:
                         file_content = file.read().decode('utf-8')
                         rows = file_content.splitlines()
-                        processData.process(rows, file_info.filename)
+                        process_data.process(rows, file_info.filename)

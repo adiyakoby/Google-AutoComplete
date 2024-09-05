@@ -1,4 +1,3 @@
-import itertools
 from collections import defaultdict
 from typing import List
 import re
@@ -6,118 +5,92 @@ import re
 
 class ProcessData:
     """
-    A class to process text data by generating all possible substrings of
-    each line, removing punctuation, and storing the processed data.
+    Processes and manages text data for autocomplete functionality.
 
-    Attributes:
-    -----------
-    __data : defaultdict
-        A dictionary that stores substrings as keys and a list of dictionaries
-        containing the original content, its index in the input, and the filename.
-
-    Methods:
-    --------
-    get_all_substrings(s: str, sub_strings: List[str]):
-        Generates all possible substrings from a given string and appends them to a list.
-
-    remove_punctuation(line: str) -> str:
-        Removes punctuation from a given string, converts it to lowercase, and returns the cleaned string.
-
-    process(lines: List[str], filename: str):
-        Processes a list of lines by cleaning them, generating all possible substrings,
-        and storing the data in the class attribute __data.
-
-    get_data() -> defaultdict:
-        Returns the processed data stored in the __data attribute.
+    This class handles the cleaning of text data, generation of substrings, and
+    storage of processed information for efficient lookup during autocomplete operations.
     """
 
     def __init__(self):
         """
-        Initializes the ProcessData class with an empty defaultdict to store the processed data.
+        Initializes the ProcessData instance with an empty defaultdict for storing data.
         """
         self.__data = defaultdict(list)
         self.__word_re = re.compile(r'\b[a-z]+\b')
 
-    def get_all_substrings(self, line: str):
+    def get_all_substrings(self, words: List[str]):
         """
-        Generates all possible substrings from a given string `s` and appends
-        them to the `sub_strings` list.
+        Generates all possible substrings from a list of words.
+
+        For each word, both prefixes and suffixes of length 2 up to the word's length
+        are generated and added to the substring set.
 
         Parameters:
-        -----------
-        s : str
-            The input string from which substrings are generated.
-        sub_strings : List[str]
-            A list to store the generated substrings.
+            words (List[str]): A list of words from which substrings are generated.
+
+        Returns:
+            set: A set of unique substrings.
         """
-        sub_strings = []
-        words = line.split()
+        sub_strings = set()
         for i in range(len(words)):
-            for j in range(2, len(words[i])+1):
-                sub_strings.append(words[i][0:j])
-            if i > 1:
-                sub_strings.append(words[i-1] + words[i][:1])
-                sub_strings.append(words[i - 1][1:] + words[i][:1])
-            sub_strings.append(words[i][1:])
+            n = len(words[i])
+            for j in range(2, n+1):
+                sub_strings.add(words[i][0:j])
+                sub_strings.add(words[i][-j:n])
         return sub_strings
-
-
-
-
-
 
     def remove_punctuation(self, line):
         """
-        Removes punctuation from a given string, converts it to lowercase, and
-        returns the cleaned string.
+        Cleans a line of text by removing punctuation and converting to lowercase.
+
+        Only alphabetical words are retained.
 
         Parameters:
-        -----------
-        line : str
-            The input string to be cleaned.
+            line (str): The input line to clean.
 
         Returns:
-        --------
-        str
-            The cleaned string without punctuation, converted to lowercase.
+            str: The cleaned, lowercase version of the line without punctuation.
         """
         return ' '.join(self.__word_re.findall(line.lower()))
 
 
     def process(self, lines: List, filename: str):
         """
-        Processes a list of lines by cleaning each line, generating all possible
-        substrings, and storing the data in the class attribute __data.
+        Processes a list of lines from a text file and stores substrings with metadata.
+
+        Each line is cleaned, substrings are generated, and the data is stored in the
+        internal defaultdict along with the original line content, line number, and filename.
 
         Parameters:
-        -----------
-        lines : List[str]
-            A list of strings (lines) to be processed.
-        filename : str
-            The name of the file where the lines originated from.
+            lines (List[str]): A list of lines from a text file.
+            filename (str): The name of the file being processed.
         """
 
         for i in range(len(lines)):
             clean_line = self.remove_punctuation(lines[i].strip())
 
             if clean_line:
-                sub_string = self.get_all_substrings(clean_line)
+                sub_string = self.get_all_substrings(clean_line.split())
                 for substring in sub_string:
-                    self.__data[substring].append((lines[i], i+1,  filename))
+                    self.__data[substring].append((lines[i], i+1, filename or "Unknown"))
+        print("proccessed file", filename)
 
 
     def get_data(self):
         """
-        Returns the processed data stored in the __data attribute.
+        Retrieves the processed data.
 
         Returns:
-        --------
-        defaultdict
-            A dictionary where keys are substrings and values are lists of dictionaries
-            containing the original content, its index in the input, and the filename.
+            defaultdict: A dictionary where keys are substrings and values are lists of tuples
+                         containing the sentence, line number, and source filename.
         """
         return self.__data
 
+    def set_data(self, data):
+        """
+        Sets the internal data with the provided data.
 
-if __name__ == "__main__":
-    pass
+        Parameters:
+            data (defaultdict): The processed data to be stored internally.
+        """
+        self.__data = data
